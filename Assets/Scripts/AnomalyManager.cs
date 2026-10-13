@@ -56,4 +56,23 @@ public class AnomalyManager : MonoBehaviour
 
         return true;
     }
+
+    
+    public bool ClearMatchingAnomaly(string room, AnomalyType type)
+    {
+        foreach (AnomalyController anomaly in anomalies)
+        {
+            if (anomaly == null || !anomaly.IsActive)
+                continue;
+
+            if (anomaly.RoomName == room && anomaly.Type == type)
+            {
+                return ClearAnomaly(anomaly);
+            }
+        }
+
+        return false;
+    }
+
+
 }
