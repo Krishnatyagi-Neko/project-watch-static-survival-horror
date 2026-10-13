@@ -1,7 +1,6 @@
 
 using UnityEngine;
 
-// The types of anomalies available in the game.
 public enum AnomalyType
 {
     ObjectMissing,
@@ -20,21 +19,51 @@ public class AnomalyController : MonoBehaviour
     [SerializeField] private GameObject normalState;
     [SerializeField] private GameObject anomalyState;
 
-    // Other scripts can read these values.
+    [Header("Report Deadline")]
+    [SerializeField] private float reportTimeLimit = 15f;
+
     public string RoomName => roomName;
     public AnomalyType Type => anomalyType;
     public bool IsActive { get; private set; }
 
+    public float RemainingReportTime { get; private set; }
+    public bool DeadlineExpired { get; private set; }
+
     private void Awake()
     {
-        // Every anomaly starts in its normal state.
         SetActiveState(false);
+    }
+
+    private void Update()
+    {
+        // Only count down while this anomaly is active.
+        if (!IsActive || DeadlineExpired)
+            return;
+
+        RemainingReportTime -= Time.deltaTime;
+
+        // The deadline has expired.
+        if (RemainingReportTime <= 0f)
+        {
+            RemainingReportTime = 0f;
+            DeadlineExpired = true;
+
+            Debug.Log("Report deadline expired in " + roomName);
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ReduceSanity(25f);
+            }
+        }
     }
 
     public void Activate()
     {
         if (IsActive)
             return;
+
+        RemainingReportTime = reportTimeLimit;
+        DeadlineExpired = false;
 
         SetActiveState(true);
 

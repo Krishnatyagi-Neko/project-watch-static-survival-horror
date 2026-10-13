@@ -74,5 +74,32 @@ public class AnomalyManager : MonoBehaviour
         return false;
     }
 
+    
+    public bool TryClearMatchingAnomaly(
+        string room,
+        AnomalyType type,
+        out bool reportedOnTime)
+    {
+        reportedOnTime = false;
+
+        foreach (AnomalyController anomaly in anomalies)
+        {
+            if (anomaly == null || !anomaly.IsActive)
+                continue;
+
+            if (anomaly.RoomName == room && anomaly.Type == type)
+            {
+                // Check the deadline before clearing the anomaly.
+                reportedOnTime = !anomaly.DeadlineExpired;
+
+                // Clear it and update the active count.
+                return ClearAnomaly(anomaly);
+            }
+        }
+
+        return false;
+    }
+
+
 
 }

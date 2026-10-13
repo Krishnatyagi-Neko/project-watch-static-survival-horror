@@ -13,28 +13,42 @@ public class ReportManager : MonoBehaviour
 
     public bool CanReport => Time.time >= nextReportTime;
 
+    
     public bool SubmitReport(string room, AnomalyType type)
     {
-        // Prevent reports during the cooldown.
         if (!CanReport)
         {
             Debug.Log("Please wait before reporting again.");
             return false;
         }
 
-        // Ask the anomaly manager to find and clear a match.
-        bool correct = anomalyManager.ClearMatchingAnomaly(room, type);
+        bool found = anomalyManager.TryClearMatchingAnomaly(
+            room,
+            type,
+            out bool reportedOnTime
+        );
 
-        if (correct)
+        if (found)
         {
-            Debug.Log("Correct report!");
-        }
-        else
-        {
-            Debug.Log("Incorrect report!");
-            nextReportTime = Time.time + reportCooldown;
+            if (reportedOnTime)
+            {
+                Debug.Log("Correct report submitted on time!");
+
+                if (GameManager.Instance != null)
+                    GameManager.Instance.RewardCorrectReport();
+            }
+            else
+            {
+                Debug.Log("Anomaly reported, but the deadline was missed.");
+            }
+
+            return true;
         }
 
-        return correct;
+        Debug.Log("Incorrect report!");
+        nextReportTime = Time.time + reportCooldown;
+
+        return false;
     }
+
 }
