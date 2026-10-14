@@ -3,38 +3,31 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    // Holds the name and viewpoint of one security camera.
-    [System.Serializable]
-    public class SecurityCamera
-    {
-        public string cameraName;
-        public Transform viewpoint;
-    }
-
-    // The actual camera that displays the game.
     [SerializeField] private Camera mainCamera;
+    [SerializeField] private Transform[] cameraViews;
 
-    // All available security camera viewpoints.
-    [SerializeField] private SecurityCamera[] cameras;
-
-    // Called by a UI button to switch the current view.
     public void SwitchCamera(int index)
     {
-        // Prevent invalid array indexes.
-        if (index < 0 || index >= cameras.Length)
+        if (mainCamera == null)
+        {
+            Debug.LogError("Main Camera is not assigned!");
             return;
+        }
 
-        // Get the selected camera's viewpoint.
-        Transform target = cameras[index].viewpoint;
-
-        // Make sure a viewpoint has been assigned.
-        if (target == null)
+        if (cameraViews == null ||
+            index < 0 ||
+            index >= cameraViews.Length ||
+            cameraViews[index] == null)
+        {
+            Debug.LogError("Invalid camera view index: " + index);
             return;
+        }
 
-        // Move and rotate the Main Camera to the viewpoint.
         mainCamera.transform.SetPositionAndRotation(
-            target.position,
-            target.rotation
+            cameraViews[index].position,
+            cameraViews[index].rotation
         );
+
+        Debug.Log("Switched to camera view: " + cameraViews[index].name);
     }
 }

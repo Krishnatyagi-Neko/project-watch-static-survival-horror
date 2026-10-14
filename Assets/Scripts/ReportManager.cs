@@ -20,13 +20,13 @@ public class ReportManager : MonoBehaviour
         {
             Debug.Log("Please wait before reporting again.");
             return false;
-        }
+        }   
 
         bool found = anomalyManager.TryClearMatchingAnomaly(
             room,
             type,
             out bool reportedOnTime
-        );
+        );  
 
         if (found)
         {
