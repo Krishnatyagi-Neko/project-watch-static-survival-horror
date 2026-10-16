@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public enum AnomalyType
@@ -21,6 +20,9 @@ public class AnomalyController : MonoBehaviour
 
     [Header("Report Deadline")]
     [SerializeField] private float reportTimeLimit = 15f;
+
+    // Fired once when the report deadline runs out (AnomalyManager listens to this)
+    public event System.Action<AnomalyController> DeadlineExpiredEvent;
 
     public string RoomName => roomName;
     public AnomalyType Type => anomalyType;
@@ -54,6 +56,9 @@ public class AnomalyController : MonoBehaviour
             {
                 GameManager.Instance.ReduceSanity(25f);
             }
+
+            // Sanity penalty is applied first, then the manager clears the anomaly
+            DeadlineExpiredEvent?.Invoke(this);
         }
     }
 

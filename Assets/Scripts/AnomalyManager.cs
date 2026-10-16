@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +7,32 @@ public class AnomalyManager : MonoBehaviour
     [SerializeField] private List<AnomalyController> anomalies = new();
 
     public int ActiveCount { get; private set; }
+
+    private void Awake()
+    {
+        // Listen for deadline expiry on every anomaly so we can clear it
+        foreach (AnomalyController anomaly in anomalies)
+        {
+            if (anomaly != null)
+                anomaly.DeadlineExpiredEvent += HandleExpired;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        foreach (AnomalyController anomaly in anomalies)
+        {
+            if (anomaly != null)
+                anomaly.DeadlineExpiredEvent -= HandleExpired;
+        }
+    }
+
+    // Sanity penalty has already been applied by the controller at this point,
+    // so we just remove the anomaly and fix the active count.
+    private void HandleExpired(AnomalyController anomaly)
+    {
+        ClearAnomaly(anomaly);
+    }
 
     public bool TrySpawnAnomaly()
     {
@@ -29,16 +54,12 @@ public class AnomalyManager : MonoBehaviour
             return false;
         }
 
-        // Select one random anomaly.
+        // Select one random anomaly and activate it.
         int randomIndex = Random.Range(0, available.Count);
         AnomalyController chosen = available[randomIndex];
-
-        // Activate the selected anomaly.
         chosen.Activate();
 
-        // Update our active anomaly count.
         ActiveCount++;
-
         Debug.Log("Active anomalies: " + ActiveCount);
 
         return true;
@@ -57,7 +78,6 @@ public class AnomalyManager : MonoBehaviour
         return true;
     }
 
-    
     public bool ClearMatchingAnomaly(string room, AnomalyType type)
     {
         foreach (AnomalyController anomaly in anomalies)
@@ -74,7 +94,6 @@ public class AnomalyManager : MonoBehaviour
         return false;
     }
 
-    
     public bool TryClearMatchingAnomaly(
         string room,
         AnomalyType type,
@@ -99,7 +118,4 @@ public class AnomalyManager : MonoBehaviour
 
         return false;
     }
-
-
-
 }
