@@ -14,6 +14,13 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private GameObject staticFlash;
     [SerializeField] private float flashTime = 0.2f;
 
+
+    private int currentIndex = -1;
+
+    public string CurrentRoom =>
+    currentIndex >= 0 ? cameraViews[currentIndex].name.Replace("View_", "") : "";
+
+
     private Vector3 deskPos;
     private Quaternion deskRot;
     private Coroutine routine;
@@ -43,6 +50,7 @@ public class CameraManager : MonoBehaviour
         }
 
         if (routine != null) StopCoroutine(routine);
+        currentIndex = index;
         routine = StartCoroutine(SwitchRoutine(index));
     }
 

@@ -107,6 +107,12 @@ public class GameManager : MonoBehaviour
             GameOver();
     }
 
+    public void PenalizeMissedAnomaly()
+    {
+        ReduceSanity(sanityLossPerMissedAnomaly);
+    }
+
+
     public void TryRest()
     {
         if (IsGameOver || HasWon || !gameStarted)

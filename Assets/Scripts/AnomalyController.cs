@@ -52,9 +52,9 @@ public class AnomalyController : MonoBehaviour
 
             Debug.Log("Report deadline expired in " + roomName);
 
-            if (GameManager.Instance != null)
+           if (GameManager.Instance != null)
             {
-                GameManager.Instance.ReduceSanity(25f);
+                GameManager.Instance.PenalizeMissedAnomaly();
             }
 
             // Sanity penalty is applied first, then the manager clears the anomaly

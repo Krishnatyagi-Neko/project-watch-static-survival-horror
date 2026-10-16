@@ -1,4 +1,3 @@
-
 using UnityEngine;
 
 public class ReportManager : MonoBehaviour
@@ -8,39 +7,32 @@ public class ReportManager : MonoBehaviour
 
     [Header("Settings")]
     [SerializeField] private float reportCooldown = 3f;
+    [SerializeField] private float wrongReportSanityCost = 15f;
 
     private float nextReportTime;
 
     public bool CanReport => Time.time >= nextReportTime;
 
-    
     public bool SubmitReport(string room, AnomalyType type)
     {
         if (!CanReport)
         {
             Debug.Log("Please wait before reporting again.");
             return false;
-        }   
+        }
 
         bool found = anomalyManager.TryClearMatchingAnomaly(
             room,
             type,
             out bool reportedOnTime
-        );  
+        );
 
         if (found)
         {
-            if (reportedOnTime)
-            {
-                Debug.Log("Correct report submitted on time!");
+            Debug.Log("Correct report submitted!");
 
-                if (GameManager.Instance != null)
-                    GameManager.Instance.RewardCorrectReport();
-            }
-            else
-            {
-                Debug.Log("Anomaly reported, but the deadline was missed.");
-            }
+            if (GameManager.Instance != null)
+                GameManager.Instance.RewardCorrectReport();
 
             return true;
         }
@@ -48,7 +40,9 @@ public class ReportManager : MonoBehaviour
         Debug.Log("Incorrect report!");
         nextReportTime = Time.time + reportCooldown;
 
+        if (GameManager.Instance != null)
+            GameManager.Instance.ReduceSanity(wrongReportSanityCost);
+
         return false;
     }
-
 }
